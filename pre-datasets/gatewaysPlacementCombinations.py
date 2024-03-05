@@ -10,7 +10,6 @@ args = parser.parse_args()
 cwd = os.getcwd()
 resFolder = "{}/".format(cwd) + args.path
 
-
 matrix_size = 10
 objects_to_place = int(args.nGat)
 
