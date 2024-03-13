@@ -3,11 +3,11 @@
 ---
 <p align='center' style="margin-bottom: -4px">Rogério S. Silva<sup>1,2</sup>, Renan R de Oliveira<sup>1,3</sup>, Xavier Sebastião<sup>1</sup>, Cleyber Bezerra<sup>1</sup>, Antonio Oliveira-JR<sup>1</sup> Kleber V. Cardoso<sup>1</sup></p>
 <p align='center' style="margin-bottom: -4px"><sup>1</sup>Instituto de Informática, Universidade Federal de Goiás</p>
-<p align='center'>E-mail: {cleyberbezerra, xaviersebastiao, kleber, antonio}@inf.ufg.br</p>
-<p align='center' style="margin-bottom: -4px"><sup>2</sup>NumbERS, Instituto Federal de Goiás-Inhumas-GO</p>
+<p align='center'>E-mail: {cleyber, xavier, kleber, antonio}@inf.ufg.br</p>
+<p align='center' style="margin-bottom: -4px"><sup>2</sup>NumbERS, Instituto Federal de Goiás - Inhumas - GO</p>
 <p align='center' style="margin-bottom: -4px">E-mail: {rogerio.sousa}@ifg.edu.br</p>
-<p align='center' style="margin-bottom: -4px"><sup>2</sup>Instituto Federal de Goiás-Goiânia-GO</p>
-<p align='center' style="margin-bottom: -4px">E-mail: {renan.oliveira}@ifg.edu.br</p>
+<p align='center' style="margin-bottom: -4px"><sup>3</sup>Instituto Federal de Goiás - Goiânia - GO</p>
+<p align='center' style="margin-bottom: -4px">E-mail: {renan.rodrigues}@ifg.edu.br</p>
 
 ---
 # Table of Contents
