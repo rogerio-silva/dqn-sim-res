@@ -19,7 +19,13 @@
 ## Article Summary
 
 ## Structure of the Repository
-Folder: [`pre-datasets`](./pre-datasets/) contains the datasets used to train the DQN model.
++ Folders: 
+
+    [`pre-datasets`](./pre-datasets/) contains the datasets used to train the DQN model.
+    
+    [`results`](./results/) contains the results of the simulations.
+    
+    [`scratch`](./scratch/) contains the ns-3 code used to generate the QoS datasets.
 
 ## Replicating the Experiment
 
