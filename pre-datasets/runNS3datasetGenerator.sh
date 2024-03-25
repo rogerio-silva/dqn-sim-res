@@ -2,13 +2,13 @@
 
 # shellcheck disable=SC1068
 progr="/home/rogerio/git/ns-allinone-3.40/ns-3.40/build/scratch/ns3.40-generate-dataset-dqn-experiment-debug"
-g=2
+g=3
 state=0
 thread=1
 seed=1
-
+filename="gatewaysPositions_${g}G.dat"
 # dataset Generator
-exec 3< gatewaysPositions_2G.dat
+exec 3< $filename
 while IFS= read -r line <&3
 do
 #  for s in $(seq 1 10); do #seed = 30 executions
@@ -21,8 +21,9 @@ do
       # shellcheck disable=SC2003
       thread=$(expr $state % 20)
       taskset -c $thread $d10 &
+      pid=$!
       if [ "$thread" -eq 0 ]; then
-        wait
+        waitpid $pid
       fi
 #    done
     end=$(date +%s.%N)

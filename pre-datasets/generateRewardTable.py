@@ -2,6 +2,8 @@ import pandas as pd
 import itertools
 import os
 import argparse
+import time
+from tqdm import tqdm
 
 parser = argparse.ArgumentParser()
 parser.add_argument("matrix_size")
@@ -24,64 +26,74 @@ actions = list(itertools.product(movements, repeat=n_drones))
 
 
 # Function to find the QoS value for a given action
-def find_newstate_qos(qos, iq, ia, actions, qosDF):
-    qosValue = 0
-    xy_positions = [(pos // matrix_size, pos % matrix_size) for pos in positions[iq]]
-    xy_temp_positions = xy_positions.copy()
-    for ind, pos in enumerate(xy_positions):
-        if actions[xy_positions.index(pos)] == 'Up':
-            if pos[0] + 1 >= matrix_size:
-                qosValue = -1
-                break
-            pos = (pos[0] + 1, pos[1])
-        elif actions[xy_positions.index(pos)] == 'Down':
-            if pos[0] - 1 < 0:
-                qosValue = -1
-                break
-            pos = (pos[0] - 1, pos[1])
-        elif actions[xy_positions.index(pos)] == 'Left':
-            if pos[1] - 1 < 0:
-                qosValue = -1
-                break
-            pos = (pos[0], pos[1] - 1)
-        elif actions[xy_positions.index(pos)] == 'Right':
-            if pos[1] + 1 >= matrix_size:
-                qosValue = -1
-                break
-            pos = (pos[0], pos[1] + 1)
-        else:  # stopped
-            pass
-        xy_temp_positions[ind] = pos
+def find_target_state_qos(iq, ia):
+    target_state = 0
+    actual_state = states[iq]
+    target_position = [-1 for _ in range(n_drones)]
+    actual_positions = positions[iq]
+    acts = actions[ia]
 
-    if qosValue == -1:
-        ret = iq, -1
-    else:
-        # Compute the new position index
-        new_position = tuple([pos[0] * matrix_size + pos[1] for pos in xy_temp_positions])
-        # Sort tuple to find the new state
-        new_position = tuple(sorted(new_position))
-        # Discard collisions with penalty
-        if len(set(new_position)) < n_drones:
-            ret = iq, -2
-        else:
-            # Get the new state
-            new_state = positions.index(new_position)
-            # Set new state and QoS value from the dataframe
-            ret = new_state, qosDF.at[new_state, 'qos']
+    for ai, ac in enumerate(acts):
+        if ac == 'Up':
+            if actual_positions[ai] + matrix_size >= matrix_size * matrix_size:
+                target_state = -1
+                break
+            target_position[ai] = actual_positions[ai] + matrix_size
+        elif ac == 'Down':
+            if actual_positions[ai] - matrix_size < 0:
+                target_state = -1
+                break
+            target_position[ai] = actual_positions[ai] - matrix_size
+        elif ac == 'Left':
+            if actual_positions[ai] % matrix_size == 0:
+                target_state = -1
+                break
+            target_position[ai] = actual_positions[ai] - 1
+        elif ac == 'Right':
+            if actual_positions[ai] % matrix_size == matrix_size - 1:
+                target_state = -1
+                break
+            target_position[ai] = actual_positions[ai] + 1
+        else:  # stopped
+            target_position[ai] = actual_positions[ai]
+
+    # Invalid movement
+    if target_state == -1:
+        return [iq, -1]
+
+    # Collisions
+    target_position = tuple(sorted(target_position))
+    if len(set(target_position)) < n_drones:
+        return [iq, -2]
+
+    target_state = states[positions.index(tuple(target_position))]
+    qos_target_state = qosDF.at[target_state, 'qos']
+    ret = [target_state, qos_target_state]
     return ret
 
 
+start_time = time.time()
+
 # Read the QoS values from the file to a dataframe
-qosDF = pd.read_csv(f"{resFolder}/qos_{n_drones}.dat", sep=" ", index_col="state")
-# Add new actions columns to the dataframe
-for ia, action in enumerate(actions):
-    qosDF[ia] = [[0, 0] for _ in range(len(states))]
+qosDF = pd.read_csv(f"{resFolder}/qos_{n_drones}.dat",
+                    sep=" ", index_col="state")
 
-for iq, qos in qosDF.iterrows():
+print("Processing rewards...")
+string_line = ""
+file = open(f"{resFolder}/reward_{n_drones}.dat", 'w')
+string_line = "state qos " + " ".join([f"{ia}" for ia in range(len(actions))])
+
+with open(f"{resFolder}/reward_{n_drones}.dat", 'a') as file:
+    file.write(string_line + "\n")
+
+for iq in tqdm(states, desc="Progress: ", unit=" states"):
+    string_line = f"{iq} {qosDF.at[iq, 'qos']} "
     for ia, action in enumerate(actions):
-        newstate, qos_newstate = find_newstate_qos(qos, iq, ia, action, qosDF)
-        qosDF.at[iq, ia] = [newstate, qos_newstate]
+        target_state, target_qos = find_target_state_qos(iq, ia)
+        string_line += f"[{target_state}, {target_qos}] "
+    # Save the string_line to a file
+    with open(f"{resFolder}/reward_{n_drones}.dat", 'a') as file:
+        file.write(string_line + "\n")
 
-# Save the dataframe to a file
-qosDF.to_csv(f"{resFolder}/reward_{n_drones}.dat", sep=" ")
-
+print("Reward table generated successfully")
+file.close()
