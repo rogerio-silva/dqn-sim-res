@@ -90,10 +90,10 @@ for iq in tqdm(states, desc="Progress: ", unit=" states"):
     string_line = f"{iq} {qosDF.at[iq, 'qos']} "
     for ia, action in enumerate(actions):
         target_state, target_qos = find_target_state_qos(iq, ia)
-        string_line += f"[{target_state}, {target_qos}] "
+        string_line += f'"[{target_state}, {target_qos}]" '
     # Save the string_line to a file
     with open(f"{resFolder}/reward_{n_drones}.dat", 'a') as file:
-        file.write(string_line + "\n")
+        file.write(string_line.rstrip() + "\n")
 
 print("Reward table generated successfully")
 file.close()

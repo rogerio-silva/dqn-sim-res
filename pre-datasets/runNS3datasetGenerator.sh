@@ -1,14 +1,22 @@
 #!/bin/sh
-
+# to run this code type: ./runNS3datasetGenerator.sh -g <number_of_gateways>
 # shellcheck disable=SC1068
-progr="/home/rogerio/git/ns-allinone-3.40/ns-3.40/build/scratch/ns3.40-generate-dataset-dqn-experiment-debug"
-g=3
+progr="~/git/ns-allinone-3.40/ns-3.40/build/scratch/ns3.40-generate-dataset-dqn-experiment-debug"
+
+# get prompt parameter
+while getopts "g:" opt; do
+  case $opt in
+    g) g=$OPTARG ;;
+    \?) echo "Invalid option -$OPTARG"; exit 1 ;;
+  esac
+done
 state=0
 thread=1
 seed=1
-filename="gatewaysPositions_${g}G.dat"
+fname="gatewaysPositions_${g}G.dat"
+
 # dataset Generator
-exec 3< $filename
+exec 3< $fname
 while IFS= read -r line <&3
 do
 #  for s in $(seq 1 10); do #seed = 30 executions
